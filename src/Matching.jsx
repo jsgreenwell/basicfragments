@@ -4,8 +4,8 @@ const BACK = "🎴"
 const cards = [
     {id: 1, flipped: true, value: "😭", match: false},
     {id: 2, flipped: true, value: "🦁", match: false},
-    {id: 3, flipped: false, value: "🦆", match: false},
-    {id: 4, flipped: false, value: "😭", match: false},
+    {id: 3, flipped: true, value: "🦆", match: false},
+    {id: 4, flipped: true, value: "😭", match: false},
     {id: 5, flipped: true, value: "🦆", match: false},
     {id: 6, flipped: true, value: "🦁", match: false}
 ]
@@ -17,11 +17,11 @@ function updateCard({id}) {
 
 function Board() {
     // This will just render the board
-    // Yes, this is the hard way, but it helps to figure out the components
-
-    let board = []
+    // So this was rendering twice - hate that needs a "prevent Default" - let's use map now
+    // Removed the board list - just map is fine - still need start & end indices so mutate local variable
     // to hold all start/end ids (start will always have remainder of 1 (1 past 3) and 0 for end
     let indices = []
+    // console.log("Once or Twice?") // uncomment to check how many times this is rendering
 
     for (let i = 1; i <= cards.length; i++) {
         if (i%3 === 0) {
@@ -33,12 +33,10 @@ function Board() {
         }
     }
 
-    // Now its dynamic
-    for (let i = 0; i < indices.length; i+=2) {
-        board.push(<BoardRow start={indices[i]} end={indices[i+1]} />)
-    }
-
-    return board
+    // Now its dynamic (_ means ignore this value)
+    return indices.map((_, i) => {
+        return <BoardRow start={indices[i]} end={indices[i+1]} />
+    })
 }
 
 function BoardRow({start, end}) {
