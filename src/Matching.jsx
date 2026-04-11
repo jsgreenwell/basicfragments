@@ -4,6 +4,7 @@ import {useState} from "react";
 export default function Matching() {
     // Third iteration: Make work with state & events
     const BACK = "🎴"
+    const [clicker, setClicker] = useState({ctr: 0, idx: 0})
 
     const [cards, setCards] = useState([
         {id: 0, flipped: false, value: "😭", match: false},
@@ -45,7 +46,7 @@ export default function Matching() {
                     cards.slice(start, end).map(card => {
                         return (
                             <td>
-                                <button className="btn-game" onClick={() => updateCard(card.id)}>
+                                <button className="btn-game" onClick={() => handleCard(card.id)}>
                                     { card.flipped ? card.value : BACK }
                                 </button>
                             </td>
@@ -55,15 +56,57 @@ export default function Matching() {
         )
     }
 
+    function handleCard(id) {
+        if (clicker.ctr === 0) {
+            // This is the first click so we just need to update the Card
+            setClicker({ctr: 1, idx: id})
+            updateCard(id)
+        } else {
+            checkForMatch(id)
+            setClicker({ctr: 0, idx: 0})
+        }
+    }
+
     function updateCard(id) {
         console.log(id) // Just to check
         setCards(cards.map(card => {
-            if (card.id === id) {
+            if (card.id === id && !card.match) {
                 // The id matches so change flipped to true (to flip it)
+                // Also check if its already been matched
                 return {...card, flipped: true};
             }
             return card
         }))
+    }
+
+    function checkForMatch(idx) {
+        console.log("new index: " + idx + " vs. old index: " + clicker.idx);
+        // If we have a match - then flip both cards & set to matched
+        // So this works
+        console.log(cards[clicker.idx].value);
+        console.log(cards[idx].value)
+
+        // Match - set values & leave alone
+            if (cards[clicker.idx].value === cards[idx].value) {
+                let indices = [clicker.idx, idx]
+                setCards(cards.map(card => {
+                    if (indices.includes(card.id)) {
+                        return {...card, flipped: true, match: true};
+                    } else {
+                        return card;
+                    }
+                }))
+            } else {
+                // Reset all the cards
+                setCards(cards.map(card => {
+                    if (!card.match) {
+                        return {...card, flipped: false};
+                    } else {
+                        return card;
+                    }
+                }))
+
+            }
     }
 
     return (
